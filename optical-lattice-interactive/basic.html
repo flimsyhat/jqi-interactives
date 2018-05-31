@@ -93,7 +93,7 @@
             camera.lookAt(scene.position);
 
             renderer = new THREE.WebGLRenderer();
-            renderer.setClearColor (0xfafafa, 1);
+            renderer.setClearColor (0x101010, 1);
             renderer.setSize( w,h );
             document.getElementById("container").append( renderer.domElement );
 
@@ -110,26 +110,26 @@
 
             var gridHelper1 = new THREE.GridHelper( size, divisions );
             gridHelper1.rotation.set(Math.PI/2,0,0)
-            gridHelper1.position.set(0,0,-size-1)
+            gridHelper1.position.set(0,0,-size)
             var gridHelper2 = new THREE.GridHelper( size, divisions );
             gridHelper2.rotation.set(0,0,0)
-            gridHelper2.position.set(0,-size-1,0)
+            gridHelper2.position.set(0,-size,0)
             var gridHelper3 = new THREE.GridHelper( size, divisions );
             gridHelper3.rotation.set(0,0,Math.PI/2)
-            gridHelper3.position.set(-size-1,0,0)
+            gridHelper3.position.set(-size,0,0)
             scene.add( gridHelper1, gridHelper2, gridHelper3 );
 
-            var geometry = new THREE.PlaneGeometry( 24.04, 24.04, 32 );
-            var material = new THREE.MeshBasicMaterial( {color: 0x202020, side: THREE.DoubleSide} );
-            var plane1 = new THREE.Mesh( geometry, material );
-            plane1.position.set(0,0,-12.02)
-            var plane2 = new THREE.Mesh( geometry, material );
-            plane2.rotation.set(0,Math.PI/2,0)
-            plane2.position.set(-12.02,0,0)
-            var plane3 = new THREE.Mesh( geometry, material );
-            plane3.rotation.set(Math.PI/2,0,0)
-            plane3.position.set(0,-12.02,0)
-            scene.add( plane1, plane2, plane3 );
+            // var geometry = new THREE.PlaneGeometry( 24.04, 24.04, 32 );
+            // var material = new THREE.MeshBasicMaterial( {color: 0x202020, side: THREE.DoubleSide} );
+            // var plane1 = new THREE.Mesh( geometry, material );
+            // plane1.position.set(0,0,-12.02)
+            // var plane2 = new THREE.Mesh( geometry, material );
+            // plane2.rotation.set(0,Math.PI/2,0)
+            // plane2.position.set(-12.02,0,0)
+            // var plane3 = new THREE.Mesh( geometry, material );
+            // plane3.rotation.set(Math.PI/2,0,0)
+            // plane3.position.set(0,-12.02,0)
+            // scene.add( plane1, plane2, plane3 );
 
             //width / height of the FBO
 
