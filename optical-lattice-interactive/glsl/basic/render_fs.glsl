@@ -1,5 +1,4 @@
 uniform sampler2D positions;
-
 void main()
 {
     vec2 location = gl_PointCoord - vec2(0.5, 0.5);
