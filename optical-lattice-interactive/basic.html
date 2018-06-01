@@ -49,9 +49,6 @@
         function init()
         {
 
-            // var w = 1000;
-            // var h = 1000;
-
             let w = $('#container').outerWidth();
             let h = $('#container').outerHeight();
 
@@ -61,11 +58,13 @@
             camera.position.set( 1,1,1 );
             camera.lookAt(scene.position);
 
+            // renderer creation
             renderer = new THREE.WebGLRenderer( { alpha: true } );
             renderer.setClearColor (0x101010, 1);
             renderer.setSize( w,h );
             document.getElementById("container").append( renderer.domElement );
 
+            //Mouse controls for panning
             controls = new THREE.OrbitControls( camera, renderer.domElement );
             controls.enableDamping = true;
           	controls.dampingFactor = 0.3;
@@ -74,6 +73,7 @@
           	controls.maxDistance = 180;
           	controls.maxPolarAngle = Math.PI / 2;
 
+            //Background grid
             var size = 11;
             var divisions = 2;
 
@@ -86,19 +86,39 @@
             var gridHelper3 = new THREE.GridHelper( size, divisions );
             gridHelper3.rotation.set(0,0,Math.PI/2)
             gridHelper3.position.set(-size,0,0)
+            gridHelper1.material.opacity = 0.2;
+            gridHelper1.material.transparent = true;
+            gridHelper2.material.opacity = 0.2;
+            gridHelper2.material.transparent = true;
+            gridHelper3.material.opacity = 0.2;
+            gridHelper3.material.transparent = true;
             scene.add( gridHelper1, gridHelper2, gridHelper3 );
+            console.log(gridHelper1)
 
-            // var geometry = new THREE.PlaneGeometry( 24.04, 24.04, 32 );
-            // var material = new THREE.MeshBasicMaterial( {color: 0x202020, side: THREE.DoubleSide} );
-            // var plane1 = new THREE.Mesh( geometry, material );
-            // plane1.position.set(0,0,-12.02)
-            // var plane2 = new THREE.Mesh( geometry, material );
-            // plane2.rotation.set(0,Math.PI/2,0)
-            // plane2.position.set(-12.02,0,0)
-            // var plane3 = new THREE.Mesh( geometry, material );
-            // plane3.rotation.set(Math.PI/2,0,0)
-            // plane3.position.set(0,-12.02,0)
-            // scene.add( plane1, plane2, plane3 );
+            var material = new THREE.LineBasicMaterial({
+            	color: 0xfafafa,
+              linewidth: 10,
+            });
+
+            var linesize = 12;
+            var linedifference = linesize - size;
+
+            var geometry = new THREE.Geometry();
+            geometry.vertices.push(
+            	new THREE.Vector3( -linesize, 0, 0 ),
+            	new THREE.Vector3( linesize, 0, 0 )
+            );
+
+            var line1 = new THREE.Line( geometry, material );
+            line1.rotation.set(0,0,0)
+            line1.position.set(linedifference,-size,-size)
+            var line2 = new THREE.Line( geometry, material );
+            line2.rotation.set(0,Math.PI/2,0)
+            line2.position.set(-size,-size,linedifference)
+            var line3 = new THREE.Line( geometry, material );
+            line3.rotation.set(0,0,Math.PI/2)
+            line3.position.set(-size,linedifference,-size)
+            scene.add( line1, line2, line3 );
 
             //width / height of the FBO
 
