@@ -38,7 +38,7 @@
             camera.lookAt(scene.position);
 
             // renderer creation
-            renderer = new THREE.WebGLRenderer( { alpha: true } );
+            renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
             renderer.setClearColor (0x004d80, 1);
             renderer.setSize( w,h );
             document.getElementById("container").append( renderer.domElement );
