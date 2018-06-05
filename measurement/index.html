@@ -114,10 +114,11 @@
           let zpos = -(x/w - 0.5) * w/(200 * 1/dpi);
           let ypos = -(y/h - 0.5) * h/(200 * 1/dpi);
           spheres.forEach(function(movingsphere) {
-            movingsphere.target = [zpos, ypos];
+            movingsphere.target = [0, zpos, ypos];
             movingsphere.targetDistance = 0.0;
             movingsphere.vz = 0.0;
             movingsphere.vy = 0.0;
+            movingsphere.sphere.material.depthWrite = true;
           });
         }
 
@@ -125,10 +126,11 @@
           event.preventDefault();
           spheres.forEach(function(movingsphere) {
             console.log(w/100, h/100)
-            movingsphere.target = [getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)), getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi))];
+            movingsphere.target = [getRand(-0.1,0.1), getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)), getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi))];
             movingsphere.targetDistance = 0.5;
             movingsphere.vz = getRand(-0.01, 0.01);
             movingsphere.vy = getRand(-0.01, 0.01);
+            movingsphere.sphere.material.depthWrite = false;
           });
         }
 
@@ -151,13 +153,15 @@
               // if sphere has a target, do distance calculations
               if (movingsphere.target) {
                 let easingAmount = 0.05;
-                var zDistance = movingsphere.target[0] - movingsphere.sphere.position.z;
-                var yDistance = movingsphere.target[1] - movingsphere.sphere.position.y;
-                var distance = Math.sqrt(zDistance * zDistance + yDistance * yDistance);
+                var xDistance = movingsphere.target[0] - movingsphere.sphere.position.x;
+                var zDistance = movingsphere.target[1] - movingsphere.sphere.position.z;
+                var yDistance = movingsphere.target[2] - movingsphere.sphere.position.y;
+                var distance = Math.sqrt(zDistance * zDistance + yDistance * yDistance + xDistance * xDistance);
                 // if still out of target distance, move to target
                 if (distance > movingsphere.targetDistance) {
                      movingsphere.sphere.position.z += zDistance * easingAmount;
                      movingsphere.sphere.position.y += yDistance * easingAmount;
+                     movingsphere.sphere.position.x += xDistance * easingAmount;
                 }
                 // else remove sphere target
                 else {
