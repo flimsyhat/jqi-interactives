@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Measurement</title>
+    <link rel="stylesheet" href="../tachyons.css">
+</head>
+<body class="sans-serif">
+
+    <div id="container" class="w-100 vh-100"></div>
+
+    <script src="three.min.js"></script>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="randomColor.js"></script>
+
+    <script>
+
+        var scene, camera, renderer;
+        var w, h;
+        var frustum = new THREE.Frustum();
+        var cameraViewProjectionMatrix = new THREE.Matrix4();
+        var lights = [];
+        var spheres = [];
+
+        function init()
+        {
+
+            w = $('#container').outerWidth();
+            h = $('#container').outerHeight();
+
+            //regular scene creation
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(30,w/h, 1,30 );
+            camera.position.set( 20,0,0 );
+            camera.lookAt(scene.position);
+
+            // renderer creation
+            renderer = new THREE.WebGLRenderer( { alpha: true } );
+            renderer.setClearColor (0x004d80, 1);
+            renderer.setSize( w,h );
+            document.getElementById("container").append( renderer.domElement );
+
+            let numSpheres = 80;
+
+            for(i=0; i<numSpheres; i++) {
+                new MovingSphere();
+            }
+
+            //scene lighting
+            lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+            lights[0].castShadow = true;
+            lights[ 0 ].position.set( 0, 20, 0 );
+            lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+            lights[ 1 ].position.set( 30, -10, 0 );
+            lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+            lights[ 2 ].position.set( -10, 0, 10);
+            lights[ 3 ] = new THREE.AmbientLight( 0x404040 );
+
+            lights.forEach(function(light) {
+              scene.add(light)
+            })
+
+            //GO !
+            window.addEventListener( "resize", onResize );
+            window.addEventListener( "mousedown", onMouseDown );
+            window.addEventListener( "mouseup", onMouseUp );
+            onResize();
+            update();
+
+        }
+
+        function MovingSphere() {
+          this.radius = getRand(0.25, 1);
+          this.target = false;
+          this.targetDistance = 0.0;
+          this.vz = getRand(-0.01, 0.01);
+          this.vy = getRand(-0.01, 0.01);
+          let geometry = new THREE.SphereGeometry(this.radius, 32, 32 );
+          let material = new THREE.MeshLambertMaterial( {color: randomColor({ hue: 'blue' }), opacity: 0.75} );
+          material.transparent = true;
+          this.sphere = new THREE.Mesh( geometry, material );
+          this.sphere.castShadow = true;
+          this.sphere.position.set(0, getRand(-h/200, h/200), getRand(-w/200, w/200));
+          spheres.push(this);
+          scene.add(this.sphere);
+        }
+
+        function getRand(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+
+        function onResize()
+        {
+            // var w = window.innerWidth;
+            // var h = window.innerHeight;
+            // renderer.setSize(w,h);
+            // camera.aspect = w/h;
+            // camera.updateProjectionMatrix();
+        }
+
+        function onMouseDown() {
+          event.preventDefault();
+          let x = event.clientX;
+          let y = event.clientY;
+          let zpos = -(x/w - 0.5) * w/100;
+          let ypos = -(y/h - 0.5) * h/100;
+          spheres.forEach(function(movingsphere) {
+            movingsphere.target = [zpos, ypos];
+            movingsphere.targetDistance = 0.0;
+            movingsphere.vz = 0.0;
+            movingsphere.vy = 0.0;
+          });
+        }
+
+        function onMouseUp() {
+          event.preventDefault();
+          spheres.forEach(function(movingsphere) {
+            movingsphere.target = [getRand(-w/200, w/200), getRand(-h/200, h/200)];
+            movingsphere.targetDistance = 0.5;
+            movingsphere.vz = getRand(-0.01, 0.01);
+            movingsphere.vy = getRand(-0.01, 0.01);
+          });
+        }
+
+        //update loop
+        function update()
+        {
+
+            // every time the camera or objects change position (or every frame)
+
+            camera.updateMatrixWorld(); // make sure the camera matrix is updated
+            camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+            cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+            frustum.setFromMatrix( cameraViewProjectionMatrix );
+
+            // frustum is now ready to check all the objects you need
+
+            requestAnimationFrame(update);
+
+            spheres.forEach(function(movingsphere) {
+              let easingAmount = 0.05;
+              var zDistance = movingsphere.target[0] - movingsphere.sphere.position.z;
+              var yDistance = movingsphere.target[1] - movingsphere.sphere.position.y;
+              var distance = Math.sqrt(zDistance * zDistance + yDistance * yDistance);
+              if (distance > movingsphere.targetDistance) {
+                   movingsphere.sphere.position.z += zDistance * easingAmount;
+                   movingsphere.sphere.position.y += yDistance * easingAmount;
+              }
+              else {
+                movingsphere.target = false;
+              }
+              movingsphere.sphere.position.y += movingsphere.vy;
+              movingsphere.sphere.position.z += movingsphere.vz;
+              if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
+                movingsphere.sphere.position.set(0, -movingsphere.sphere.position.y * 0.99, -movingsphere.sphere.position.z * 0.99);
+              }
+            });
+            //render the particles at the new location
+            renderer.render( scene, camera );
+
+        }
+
+        init();
+
+    </script>
+
+</body>
+</html>
