@@ -127,36 +127,44 @@
         function update()
         {
 
-            // every time the camera or objects change position (or every frame)
-
+            // going to use the camera frustrum to check if sphere is off-screen
             camera.updateMatrixWorld(); // make sure the camera matrix is updated
             camera.matrixWorldInverse.getInverse( camera.matrixWorld );
             cameraViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
             frustum.setFromMatrix( cameraViewProjectionMatrix );
-
-            // frustum is now ready to check all the objects you need
+            // frustum is now ready to check all the spheres
 
             requestAnimationFrame(update);
 
             spheres.forEach(function(movingsphere) {
-              let easingAmount = 0.05;
-              var zDistance = movingsphere.target[0] - movingsphere.sphere.position.z;
-              var yDistance = movingsphere.target[1] - movingsphere.sphere.position.y;
-              var distance = Math.sqrt(zDistance * zDistance + yDistance * yDistance);
-              if (distance > movingsphere.targetDistance) {
-                   movingsphere.sphere.position.z += zDistance * easingAmount;
-                   movingsphere.sphere.position.y += yDistance * easingAmount;
+              // if sphere has a target, do distance calculations
+              if (movingsphere.target) {
+                let easingAmount = 0.05;
+                var zDistance = movingsphere.target[0] - movingsphere.sphere.position.z;
+                var yDistance = movingsphere.target[1] - movingsphere.sphere.position.y;
+                var distance = Math.sqrt(zDistance * zDistance + yDistance * yDistance);
+                // if still out of target distance, move to target
+                if (distance > movingsphere.targetDistance) {
+                     movingsphere.sphere.position.z += zDistance * easingAmount;
+                     movingsphere.sphere.position.y += yDistance * easingAmount;
+                }
+                // else remove sphere target
+                else {
+                  movingsphere.target = false;
+                }
               }
-              else {
-                movingsphere.target = false;
-              }
+
+              // move sphere based on y and z velocity
               movingsphere.sphere.position.y += movingsphere.vy;
               movingsphere.sphere.position.z += movingsphere.vz;
+
+              // if sphere is off-screen, flip the y and z position
               if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
                 movingsphere.sphere.position.set(0, -movingsphere.sphere.position.y * 0.99, -movingsphere.sphere.position.z * 0.99);
               }
             });
-            //render the particles at the new location
+
+            //render the spheres at the new location
             renderer.render( scene, camera );
 
         }
