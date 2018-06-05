@@ -73,12 +73,13 @@
         }
 
         function MovingSphere() {
-          this.radius = getRand(0.25, 1);
+          this.scalePhase = getRand(0, 2 * Math.PI);
+          this.scaleRate = getRand(0.5, 1);
           this.target = false;
           this.targetDistance = 0.0;
           this.vz = getRand(-0.01, 0.01);
           this.vy = getRand(-0.01, 0.01);
-          let geometry = new THREE.SphereGeometry(this.radius, 32, 32 );
+          let geometry = new THREE.SphereGeometry(0.5, 32, 32 );
           let material = new THREE.MeshLambertMaterial( {
             color: randomColor({ hue: 'blue' }),
             opacity: 0.75,
@@ -152,7 +153,7 @@
             spheres.forEach(function(movingsphere) {
               // if sphere has a target, do distance calculations
               if (movingsphere.target) {
-                let easingAmount = 0.05;
+                let easingAmount = 0.08;
                 var xDistance = movingsphere.target[0] - movingsphere.sphere.position.x;
                 var zDistance = movingsphere.target[1] - movingsphere.sphere.position.z;
                 var yDistance = movingsphere.target[2] - movingsphere.sphere.position.y;
@@ -169,9 +170,20 @@
                 }
               }
 
-              // move sphere based on y and z velocity
-              movingsphere.sphere.position.y += movingsphere.vy;
-              movingsphere.sphere.position.z += movingsphere.vz;
+              else {
+                // move sphere based on y and z velocity
+                movingsphere.sphere.position.y += movingsphere.vy;
+                movingsphere.sphere.position.z += movingsphere.vz;
+
+                // change sphere size
+                let date = Date.now() * movingsphere.scaleRate * 0.001;
+                let scale = Math.sin(date + movingsphere.scalePhase) * .003;
+                movingsphere.sphere.scale.x += scale;
+                movingsphere.sphere.scale.y += scale;
+                movingsphere.sphere.scale.z += scale;
+              }
+
+
 
               // if sphere is off-screen, flip the y and z position
               if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
