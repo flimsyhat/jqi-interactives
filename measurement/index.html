@@ -79,11 +79,16 @@
           this.vz = getRand(-0.01, 0.01);
           this.vy = getRand(-0.01, 0.01);
           let geometry = new THREE.SphereGeometry(this.radius, 32, 32 );
-          let material = new THREE.MeshLambertMaterial( {color: randomColor({ hue: 'blue' }), opacity: 0.75} );
+          let material = new THREE.MeshLambertMaterial( {
+            color: randomColor({ hue: 'blue' }),
+            opacity: 0.75,
+            blending: THREE.NormalBlending,
+            depthWrite: false
+          });
           material.transparent = true;
           this.sphere = new THREE.Mesh( geometry, material );
           this.sphere.castShadow = true;
-          this.sphere.position.set(0, getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi)), getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)));
+          this.sphere.position.set(getRand(-0.1,0.1), getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi)), getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)));
           spheres.push(this);
           scene.add(this.sphere);
         }
@@ -166,7 +171,7 @@
 
               // if sphere is off-screen, flip the y and z position
               if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
-                movingsphere.sphere.position.set(0, -movingsphere.sphere.position.y * 0.99, -movingsphere.sphere.position.z * 0.99);
+                movingsphere.sphere.position.set(0, -movingsphere.sphere.position.y * 0.999, -movingsphere.sphere.position.z * 0.999);
               }
             });
 
