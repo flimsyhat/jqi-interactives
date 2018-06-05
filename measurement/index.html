@@ -179,7 +179,7 @@
               else {
                 // change sphere size
                 let date = Date.now() * movingsphere.scaleRate * 0.001;
-                let scale = Math.sin(date + movingsphere.scalePhase) * .01;
+                let scale = Math.sin(date + movingsphere.scalePhase) * .005;
                 movingsphere.sphere.scale.x += scale;
                 movingsphere.sphere.scale.y += scale;
                 movingsphere.sphere.scale.z += scale;
