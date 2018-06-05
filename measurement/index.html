@@ -21,12 +21,15 @@
         var cameraViewProjectionMatrix = new THREE.Matrix4();
         var lights = [];
         var spheres = [];
+        var dpi;
 
         function init()
         {
 
             w = $('#container').outerWidth();
             h = $('#container').outerHeight();
+
+            dpi = window.devicePixelRatio;
 
             //regular scene creation
             scene = new THREE.Scene();
@@ -80,7 +83,7 @@
           material.transparent = true;
           this.sphere = new THREE.Mesh( geometry, material );
           this.sphere.castShadow = true;
-          this.sphere.position.set(0, getRand(-h/200, h/200), getRand(-w/200, w/200));
+          this.sphere.position.set(0, getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi)), getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)));
           spheres.push(this);
           scene.add(this.sphere);
         }
@@ -103,8 +106,8 @@
           event.preventDefault();
           let x = event.clientX;
           let y = event.clientY;
-          let zpos = -(x/w - 0.5) * w/100;
-          let ypos = -(y/h - 0.5) * h/100;
+          let zpos = -(x/w - 0.5) * w/(200 * 1/dpi);
+          let ypos = -(y/h - 0.5) * h/(200 * 1/dpi);
           spheres.forEach(function(movingsphere) {
             movingsphere.target = [zpos, ypos];
             movingsphere.targetDistance = 0.0;
@@ -116,7 +119,8 @@
         function onMouseUp() {
           event.preventDefault();
           spheres.forEach(function(movingsphere) {
-            movingsphere.target = [getRand(-w/200, w/200), getRand(-h/200, h/200)];
+            console.log(w/100, h/100)
+            movingsphere.target = [getRand(-w/(400 * 1/dpi), w/(400 * 1/dpi)), getRand(-h/(400 * 1/dpi), h/(400 * 1/dpi))];
             movingsphere.targetDistance = 0.5;
             movingsphere.vz = getRand(-0.01, 0.01);
             movingsphere.vy = getRand(-0.01, 0.01);
@@ -126,6 +130,8 @@
         //update loop
         function update()
         {
+            // just in case browser zoom level changes
+            dpi = window.devicePixelRatio;
 
             // going to use the camera frustrum to check if sphere is off-screen
             camera.updateMatrixWorld(); // make sure the camera matrix is updated
