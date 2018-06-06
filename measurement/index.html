@@ -201,7 +201,6 @@
 
               // if sphere is off-screen, flip the y and z position
               if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
-                movingsphere.isWrapping = true;
                 movingsphere.sphere.position.set(
                   movingsphere.sphere.position.x,
                   -movingsphere.sphere.position.y * 0.999,
