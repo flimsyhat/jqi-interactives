@@ -75,13 +75,16 @@
         }
 
         function MovingSphere() {
-          this.isWrapping = false;
+          // scaling controls
           this.scalePhase = getRand(0, 2 * Math.PI);
           this.scaleRate = getRand(0.5, 1);
+          // position target
           this.target = false;
           this.targetDistance = 0.0;
+          // initial velocity
           this.vz = getRand(-0.01, 0.01);
           this.vy = getRand(-0.01, 0.01);
+          // create a sphere
           let geometry = new THREE.SphereGeometry(0.5, 32, 32 );
           let material = new THREE.MeshLambertMaterial( {
             color: randomColor({ hue: 'blue' }),
@@ -91,8 +94,10 @@
           });
           material.transparent = true;
           this.sphere = new THREE.Mesh( geometry, material );
-          this.sphere.castShadow = true;
-          this.sphere.position.set(getRand(-0.1,0.1), getRand(-h/(cameraScale * 2 * 1/dpi), h/(cameraScale * 2 * 1/dpi)), getRand(-w/(cameraScale * 2 * 1/dpi), w/(cameraScale * 2 * 1/dpi)));
+          this.sphere.position.set(
+            getRand(-0.1,0.1),
+            getRand(-h/(cameraScale * 2 * 1/dpi), h/(cameraScale * 2 * 1/dpi)),
+            getRand(-w/(cameraScale * 2 * 1/dpi), w/(cameraScale * 2 * 1/dpi)));
           spheres.push(this);
           scene.add(this.sphere);
         }
@@ -133,7 +138,10 @@
           event.preventDefault();
           spheres.forEach(function(movingsphere) {
             console.log(w/(400 * 1/dpi))
-            movingsphere.target = [getRand(-0.1,0.1), getRand(-w/(cameraScale * 2 * 1/dpi), w/(cameraScale * 2 * 1/dpi)), getRand(-h/(cameraScale * 2 * 1/dpi), h/(cameraScale * 2 * 1/dpi))];
+            movingsphere.target = [
+              getRand(-0.1,0.1),
+              getRand(-w/(cameraScale * 2 * 1/dpi), w/(cameraScale * 2 * 1/dpi)),
+              getRand(-h/(cameraScale * 2 * 1/dpi), h/(cameraScale * 2 * 1/dpi))];
             movingsphere.targetDistance = 0.5;
             movingsphere.vz = getRand(-0.01, 0.01);
             movingsphere.vy = getRand(-0.01, 0.01);
