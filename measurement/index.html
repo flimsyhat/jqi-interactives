@@ -15,14 +15,13 @@
 
     <script>
 
-        var scene, camera, renderer;
-        var cameraScale;
+        var scene, camera, cameraScale, renderer;
         var w, h;
+        var dpi;
         var frustum = new THREE.Frustum();
         var cameraViewProjectionMatrix = new THREE.Matrix4();
         var lights = [];
         var spheres = [];
-        var dpi;
 
         function init()
         {
@@ -33,7 +32,7 @@
             dpi = window.devicePixelRatio;
 
             cameraScale = 200;
-            //regular scene creation
+            // regular scene creation
             scene = new THREE.Scene();
             camera = new THREE.OrthographicCamera(w / - cameraScale, w / cameraScale, h / cameraScale, h / - cameraScale, 0, 100 );
             camera.position.set( 3,0,0 );
@@ -45,13 +44,13 @@
             renderer.setSize( w,h );
             document.getElementById("container").append( renderer.domElement );
 
+            // add spheres
             let numSpheres = 80;
-
             for(i=0; i<numSpheres; i++) {
                 new MovingSphere();
             }
 
-            //scene lighting
+            // scene lighting
             lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
             lights[0].castShadow = true;
             lights[ 0 ].position.set( 0, 20, 0 );
@@ -65,7 +64,7 @@
               scene.add(light)
             })
 
-            //GO !
+            // GO !
             window.addEventListener( "resize", onResize );
             window.addEventListener( "mousedown", onMouseDown );
             window.addEventListener( "mouseup", onMouseUp );
@@ -103,23 +102,25 @@
         }
 
         function getRand(min, max) {
+          // generates a random number within a given range
           return Math.random() * (max - min) + min;
         }
 
 
-        function onResize()
-        {
-            w = window.innerWidth;
-            h = window.innerHeight;
-            renderer.setSize(w,h);
-            camera.left = -w / cameraScale;
-            camera.right = w/ cameraScale;
-            camera.top = h / cameraScale;
-            camera.bottom = -h / cameraScale;
-            camera.updateProjectionMatrix();
+        function onResize() {
+          // recalculate renderer size and orthographic camera bounds
+          w = window.innerWidth;
+          h = window.innerHeight;
+          renderer.setSize(w,h);
+          camera.left = -w / cameraScale;
+          camera.right = w/ cameraScale;
+          camera.top = h / cameraScale;
+          camera.bottom = -h / cameraScale;
+          camera.updateProjectionMatrix();
         }
 
         function onMouseDown() {
+          // set target for each sphere to mouse location and disable depth writing
           event.preventDefault();
           let x = event.clientX;
           let y = event.clientY;
@@ -135,6 +136,7 @@
         }
 
         function onMouseUp() {
+          // set random target for each sphere and enable depth writing
           event.preventDefault();
           spheres.forEach(function(movingsphere) {
             console.log(w/(400 * 1/dpi))
@@ -178,29 +180,32 @@
                      movingsphere.sphere.position.y += yDistance * easingAmount;
                      movingsphere.sphere.position.x += xDistance * easingAmount;
                 }
-                // else remove sphere target
+                // if within target distance, remove sphere target
                 else {
                   movingsphere.target = false;
                 }
               }
 
               else {
-                // change sphere size
+                // change sphere size over time
                 let date = Date.now() * movingsphere.scaleRate * 0.001;
                 let scale = Math.sin(date + movingsphere.scalePhase) * .005;
                 movingsphere.sphere.scale.x += scale;
                 movingsphere.sphere.scale.y += scale;
                 movingsphere.sphere.scale.z += scale;
-              }
 
-              // move sphere based on y and z velocity
-              movingsphere.sphere.position.y += movingsphere.vy;
-              movingsphere.sphere.position.z += movingsphere.vz;
+                // move sphere based on y and z velocity
+                movingsphere.sphere.position.y += movingsphere.vy;
+                movingsphere.sphere.position.z += movingsphere.vz;
+              }
 
               // if sphere is off-screen, flip the y and z position
               if( !(frustum.intersectsObject( movingsphere.sphere )) ) {
                 movingsphere.isWrapping = true;
-                movingsphere.sphere.position.set(0, -movingsphere.sphere.position.y * 0.999, -movingsphere.sphere.position.z * 0.999);
+                movingsphere.sphere.position.set(
+                  movingsphere.sphere.position.x,
+                  -movingsphere.sphere.position.y * 0.999,
+                  -movingsphere.sphere.position.z * 0.999);
               }
 
             });
